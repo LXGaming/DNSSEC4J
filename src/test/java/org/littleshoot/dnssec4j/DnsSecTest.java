@@ -1,7 +1,8 @@
 package org.littleshoot.dnssec4j;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -10,7 +11,7 @@ import java.nio.channels.DatagramChannel;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public class DnsSecTest {
         final InetAddress ia = base.getAddress();
         final String resolved = ia.getHostAddress();
         
-        final InetSocketAddress unresolved = 
+        final InetSocketAddress unresolved =
             InetSocketAddress.createUnresolved("www.brown.edu", 80);
         final InetSocketAddress verified = DnsSec.verify(unresolved);
         
@@ -50,13 +51,13 @@ public class DnsSecTest {
             System.out.println("\n****************************************");
             System.out.println("  DONE TESTING "+host);
             System.out.println("****************************************");
-            assertTrue("Did not get address", ia != null);
+            assertNotNull(ia, "Did not get address");
             final InetAddress standard = InetAddress.getByName(host);
-            assertEquals("Results not equal for "+host, ia.getHostAddress(), standard.getHostAddress());
+            assertEquals(ia.getHostAddress(), standard.getHostAddress(), "Results not equal for "+host);
             final DatagramChannel channel = DatagramChannel.open();
             final SocketAddress server = new InetSocketAddress(host, 80);
             channel.connect(server);
-            assertTrue("Could not connect to host "+host, channel.isConnected());
+            assertTrue(channel.isConnected(), "Could not connect to host "+host);
             //return;
         }
         
@@ -76,12 +77,12 @@ public class DnsSecTest {
             System.out.println("\n****************************************");
             System.out.println("  DONE TESTING "+host);
             System.out.println("****************************************");
-            assertTrue("Did not get address", ia != null);
+            assertNotNull(ia, "Did not get address");
             
             final DatagramChannel channel = DatagramChannel.open();
             final SocketAddress server = new InetSocketAddress(host, 80);
             channel.connect(server);
-            assertTrue("Could not connect to host "+host, channel.isConnected());
+            assertTrue(channel.isConnected(), "Could not connect to host "+host);
         }
     }
 }

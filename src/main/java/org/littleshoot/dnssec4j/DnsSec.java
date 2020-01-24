@@ -51,7 +51,7 @@ public class DnsSec {
      * @throws DNSSECException If there's a problem with the DNS signature.
      * @throws IOException If there's a problem with the nameservers.
      */
-    public static InetSocketAddress verify(final InetSocketAddress unresolved) 
+    public static InetSocketAddress verify(final InetSocketAddress unresolved)
         throws DNSSECException, IOException {
         if (!unresolved.isUnresolved()) {
             return unresolved;

@@ -1,0 +1,96 @@
+plugins {
+    id "com.jfrog.bintray" version "1.8.4"
+    id "java"
+    id "java-library"
+    id "maven-publish"
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = "io.github.lxgaming"
+archivesBaseName = "dnssec4j"
+version = "0.1.7"
+
+configurations {
+    provided {
+        compile.extendsFrom(provided)
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    api("dnsjava:dnsjava:2.1.9")
+    api("org.slf4j:slf4j-api:1.7.30")
+    testCompile("org.junit.jupiter:junit-jupiter-api:5.6.0")
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set("javadoc")
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier.set("sources")
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_KEY")
+    publications = ["mavenPublication"]
+    pkg {
+        repo = "maven"
+        name = "DNSSEC4J"
+        licenses = ["Apache-2.0"]
+        vcsUrl = "https://github.com/LXGaming/DNSSEC4J.git"
+        publish = true
+        version {
+            name = project.version
+            released = new Date()
+        }
+    }
+}
+
+bintrayUpload {
+    onlyIf { System.getenv("BINTRAY_KEY") != null }
+    onlyIf { System.getenv("BINTRAY_USER") != null }
+    onlyIf { System.getenv("TRAVIS_BUILD_NUMBER") != null }
+    onlyIf { System.getenv("TRAVIS_JOB_NUMBER") ==~ /\d+\.1$/ }
+    onlyIf { System.getenv("TRAVIS_PULL_REQUEST") == "false" }
+}
+
+jar {
+    from {
+        (configurations.compile - configurations.provided).findAll({
+            it.isDirectory() || it.name.endsWith(".jar")
+        }).collect({
+            it.isDirectory() ? it : zipTree(it)
+        })
+    }
+}
+
+javadoc {
+    failOnError = false
+}
+
+publishing {
+    publications {
+        mavenPublication(MavenPublication) {
+            from components.java
+            groupId group
+            artifactId archivesBaseName
+            version version
+            artifact javadocJar
+            artifact sourcesJar
+        }
+    }
+}
